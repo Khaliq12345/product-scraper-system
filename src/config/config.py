@@ -5,4 +5,4 @@ load_dotenv()
 
 
 SUPABSE_URL = os.getenv("SUPABSE_URL", "")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+SUPABASE_KEY = os.getenv("SUPABASE_API_KEY", "")
