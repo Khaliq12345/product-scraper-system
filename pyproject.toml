@@ -10,3 +10,7 @@ dependencies = [
     "selectolax>=0.3.32",
     "supabase>=2.18.0",
 ]
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
