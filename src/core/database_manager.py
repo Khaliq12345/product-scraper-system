@@ -1,19 +1,25 @@
-from typing import Optional
-from supabase.client import create_client
-
+from typing import Optional, Dict, Any
+from supabase.client import create_client, Client
+from src.config.config import config
 
 class DataManager:
     def __init__(self) -> None:
-        pass
+        self.supabase: Client = create_client(config.SUPABASE_URL, config.SUPABASE_KEY)
+        self.config_table: str = config.TABLE_CACHER
+        self.data_table: str = config.TABLE_PRODUCTS #Contiendra les résultas du scraping
 
-    def get_domain_with_selector(self, domain: str) -> Optional[dict]:
-        """Extract domain selector and access type from supabase"""
-        pass
+    def get_domain_with_selector(self, domain: str) -> Optional[Dict[str, Any]]:
+        response = self.supabase.table(self.config_table).select('*').eq('domain', domain).execute()
+        if response.data:
+            return response.data[0]
+        return None
 
-    def save_domain_and_selector(self, data: dict) -> None:
-        """Save Domain with the selectors along with the access type"""
-        pass
+    def save_domain_and_selector(self, data: Dict[str, Any]) -> None:
+        domain = data.get("domain")
+        if not domain:
+            raise ValueError("Les données de configuration doivent contenir la clé 'domain'.")
+        
+        self.supabase.table(self.config_table).upsert(data, on_conflict='domain').execute()
 
-    def save_data(self, data: dict):
-        """Save product data to database"""
-        pass
+    def save_data(self, data: Dict[str, Any]):
+        self.supabase.table(self.data_table).insert(data).execute()
