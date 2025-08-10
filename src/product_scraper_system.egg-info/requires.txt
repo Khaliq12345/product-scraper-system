@@ -1,4 +1,0 @@
-hrequests[all]>=0.9.2
-python-dotenv>=1.1.1
-selectolax>=0.3.32
-supabase>=2.18.0
