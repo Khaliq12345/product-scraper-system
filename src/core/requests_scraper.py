@@ -15,6 +15,7 @@ class StaticScraper(ScraperBase):
     def get_html_text(self) -> Optional[str]:
         with hrequests.Session() as session:
             resp = session.get(self.url)
-            resp.raise_status_code()
+            if resp.status_code >= 400:
+             raise Exception(f"HTTP Error {resp.status_code} for URL: {self.url}")
             soup = HTMLParser(resp.text)
             return soup.html
