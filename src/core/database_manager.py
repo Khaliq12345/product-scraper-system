@@ -1,10 +1,10 @@
 from typing import Optional, Dict, Any
 from supabase.client import create_client, Client
-from src.config.config import SUPABASE_URL, SUPABASE_KEY
+from src.config.config import SUPABSE_URL, SUPABASE_KEY
 
 class DataManager:
     def __init__(self) -> None:
-       self.supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+       self.supabase: Client = create_client(SUPABSE_URL, SUPABASE_KEY)
        self.config_table: str = "cacher"          
        self.data_table: str = "products"          
 
