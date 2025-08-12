@@ -13,19 +13,23 @@ class ScraperBase(ABC):
     def __init__(self, url: str) -> None:
         self.url = url
         self.database_manager = DataManager()
-        self.selector_manager = SelectorManager()
 
     @abstractmethod
     def get_html_text(self) -> Optional[str]:
         """Send requests to the specified url and get the html"""
         pass
 
-    def run(self):
+    def run(self) -> bool:
         html = self.get_html_text()
         if not html:
-            return {}
-        parsed_data = self.selector_manager.parse(html)
+            return False
+
+        self.selector_manager = SelectorManager(html=html)
+        parsed_data = self.selector_manager.parse()
 
         # send selectors and access_type to cache database
 
         # send data to cache database
+
+        print("Scraping completed")
+        return True

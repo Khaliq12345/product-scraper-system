@@ -13,8 +13,11 @@ class StaticScraper(ScraperBase):
         super().__init__(url)
 
     def get_html_text(self) -> Optional[str]:
+        """Extract html using simple requests"""
         with hrequests.Session() as session:
             resp = session.get(self.url)
-            resp.raise_status_code()
+            print(f"Status code - {resp.status_code}")
+            if resp.status_code != 200:
+                return None
             soup = HTMLParser(resp.text)
             return soup.html
