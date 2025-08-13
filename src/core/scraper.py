@@ -25,7 +25,8 @@ class ScraperBase(ABC):
             return False
 
         self.selector_manager = SelectorManager(html=html)
-        parsed_data = self.selector_manager.parse()
+        self.selector_manager.parse()
+        print(self.selector_manager.output)
 
         # send selectors and access_type to cache database
 

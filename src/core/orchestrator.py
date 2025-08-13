@@ -40,6 +40,6 @@ class Orchestrator:
 
 
 if __name__ == "__main__":
-    url = "https://www.acmetools.com/bosch-18v-brushless-9-inch-cutoff-saw-kit-gcs18v-230n212/S0000000088753.html"
+    url = "https://www.albanypark.com/collections/barton/products/barton-sofa?variant=41412605607987"
     runner = Orchestrator(url)
     runner.main()
