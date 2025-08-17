@@ -9,8 +9,8 @@ from src.core.scraper import ScraperBase
 
 
 class StaticScraper(ScraperBase):
-    def __init__(self, url: str) -> None:
-        super().__init__(url)
+    def __init__(self, url: str, product_id: str) -> None:
+        super().__init__(url, product_id)
 
     def get_html_text(self) -> Optional[str]:
         """Extract html using simple requests"""

@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 from gotrue import Optional
 from selectolax.parser import HTMLParser
@@ -51,9 +52,9 @@ class SelectorManager:
         elif len(value_attr) > 0:
             return self.selector_to_text(value_attr[0], name=name)
 
-    def parse(self) -> None:
+    def parse(self, domain_data: dict) -> None:
         """Parse html to dictionary"""
-        print("SELECTOR MANAGER -- Extracting selector for a new domain")
+        print("SELECTOR MANAGER -- Extracting selector for a domain")
         parsed_dict: Dict[str, Optional[str]] = {
             "name": None,
             "price": None,
@@ -61,18 +62,46 @@ class SelectorManager:
             "brand": None,
         }
         selectors_values = None
-        parsed_dict["name"] = self.selector_to_text(
-            'meta[property="og:title"]', attribute="content", name="name"
-        )
-        parsed_dict["price"] = self.selector_to_text(
-            'meta[property="og:price"]', attribute="content", name="price"
-        )
-        parsed_dict["image"] = self.selector_to_text(
-            'meta[property="og:image"]', attribute="content", name="image"
-        )
-        parsed_dict["brand"] = self.selector_to_text(
-            'meta[propert="og:brand"]', attribute="content", name="brand"
-        )
+        if domain_data:
+            for x in [
+                "name_selector",
+                "price_selector",
+                "image_selector",
+                "brand_selector",
+            ]:
+                x_name = x.replace("_selector", "")
+                x_selector_attribute = domain_data.get(x)
+                if not x_selector_attribute:
+                    continue
+                x_selector_attribute = json.loads(x_selector_attribute)
+                x_selector = x_selector_attribute.get("selector")
+                x_attribute = x_selector_attribute.get("attribute")
+                parsed_dict[x_name] = self.selector_to_text(
+                    x_selector, x_name, x_attribute
+                )
+        else:
+            parsed_dict["name"] = self.selector_to_text(
+                domain_data.get("name_selector") or 'meta[property="og:title"]',
+                attribute="content",
+                name="name",
+            )
+            parsed_dict["price"] = self.selector_to_text(
+                domain_data.get("price_selector")
+                or 'meta[property="og:price"]',
+                attribute="content",
+                name="price",
+            )
+            parsed_dict["image"] = self.selector_to_text(
+                domain_data.get("image_selector")
+                or 'meta[property="og:image"]',
+                attribute="content",
+                name="image",
+            )
+            parsed_dict["brand"] = self.selector_to_text(
+                domain_data.get("brand_selector") or 'meta[propert="og:brand"]',
+                attribute="content",
+                name="brand",
+            )
         for key in parsed_dict:
             if not parsed_dict[key]:
                 print(
