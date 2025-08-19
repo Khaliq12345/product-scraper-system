@@ -1,13 +1,13 @@
 <template>
   <div>
     <UForm :state="state" class="space-y-4 m-8" @submit.prevent="getProduct">
-      <UFormField label="Enter the product Url" name="url">
+      <UFormField label="Enter the product Url" name="url" class="text-black">
         <UInput
           v-model="state.url"
           type="url"
           placeholder="https://example.com"
           required
-          class="w-full"
+          class="w-full text-black"
         />
       </UFormField>
 
