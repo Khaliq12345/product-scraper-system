@@ -47,6 +47,8 @@ class ScraperBase(ABC):
             return False
         product_output["product_id"] = self.product_id
         product_output["status"] = "success"
+        product_output["domain"] = domain
+        product_output["link"] = self.url
         self.database_manager.save_data(product_output)
 
         print("Scraping completed")
