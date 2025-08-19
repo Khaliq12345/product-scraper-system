@@ -1,9 +1,2 @@
-import { defineAppConfig } from "nuxt/app"
-export default defineAppConfig({
-  ui: {
-    colors: {
-      primary: 'black',
-      secondary: 'white'
-    }
-  }
-})
+import { defineAppConfig } from "nuxt/app";
+export default defineAppConfig({});

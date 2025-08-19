@@ -6,7 +6,7 @@ from time import time
 app = FastAPI(title="Product Scraper")
 
 
-@app.get("/scrape-product")
+@app.get("/api/scrape-product")
 def scrape_product(background_tasks: BackgroundTasks, url: str):
     product_id = int(time())
     product_id = f"product_{product_id}"
@@ -15,7 +15,7 @@ def scrape_product(background_tasks: BackgroundTasks, url: str):
     return {"details": {"product_id": product_id}}
 
 
-@app.get("/get-product")
+@app.get("/api/get-product")
 def get_product(product_id: str):
     db_manager = DataManager()
     product = db_manager.get_product_info(product_id)
