@@ -3,6 +3,7 @@ from typing import Optional
 
 sys.path.append("..")
 
+from src.core.browser_scraper import DynamicScraper
 from src.core.database_manager import DataManager
 from src.core.requests_scraper import StaticScraper
 from urllib.parse import urlparse
@@ -13,6 +14,7 @@ class Orchestrator:
         self.product_id = product_id
         self.database = DataManager()
         self.static_scraper = StaticScraper(url, product_id)
+        self.dynamic_scraper = DynamicScraper(url, product_id)
         self.url = url
         self.domain = urlparse(url).netloc
 
@@ -23,23 +25,22 @@ class Orchestrator:
         )
         is_done = False
         if domain_data["access_type"] == "static":
-            is_done = self.static_scraper.run(
-                "static", self.domain, domain_data
-            )
+            is_done = self.static_scraper.run("static", self.domain, domain_data)
         elif domain_data["access_type"] == "dynamic":
-            is_done = False
+            is_done = self.dynamic_scraper.run("dynamic", self.domain, domain_data)
         return is_done
 
     def new_domain_handler(self) -> Optional[bool]:
         """Handle new domain"""
         print("New domain deteced - Trying the static method")
+        # run the static scraper
         access_type = "static"
         is_done = self.static_scraper.run(access_type, self.domain, {})
         if not is_done:
             access_type = "dynamic"
             print("Fallback to browser method")
             # run the browser scraper
-            pass
+            is_done = self.dynamic_scraper.run(access_type, self.domain, {})
         return is_done
 
     def main(self):

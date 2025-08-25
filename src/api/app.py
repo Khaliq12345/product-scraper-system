@@ -7,7 +7,12 @@ app = FastAPI(title="Product Scraper")
 
 
 @app.get("/api/scrape-product")
-def scrape_product(background_tasks: BackgroundTasks, url: str):
+def scrape_product(background_tasks: BackgroundTasks, url: str, force: bool = False):
+    if not force:
+        db_manager = DataManager()
+        product = db_manager.get_product_info(product_url=url)
+        if product:
+            return {"details": {"product_id": product["product_id"]}}
     product_id = int(time())
     product_id = f"product_{product_id}"
     runner = Orchestrator(url, product_id)

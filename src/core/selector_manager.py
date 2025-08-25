@@ -10,7 +10,8 @@ class SelectorManager:
     def __init__(self, html: str) -> None:
         self.html = html
         self.html_node = HTMLParser(html)
-        self.llm_manager = LlmManager(self.html_node.body)
+        body = self.html_node.body
+        self.llm_manager = LlmManager(body.html)
         self.output = {}
         self.output["selectors"] = {}
         self.output["values"] = {}
@@ -107,15 +108,14 @@ class SelectorManager:
                 print(
                     "SELECTOR MANAGER -- Meta parsing is incomplete or unavailable. Fallback to LLM"
                 )
-                selectors_values = self.llm_manager.run()
+                selectors_values = self.llm_manager.get_selectors()
                 break
 
         if selectors_values:
-            print(selectors_values)
             for key in parsed_dict:
                 parsed_dict[key] = (
                     parsed_dict[key]
-                    if parsed_dict[key]
+                    if parsed_dict.get(key)
                     else self.llm_selector_text(
                         selectors_values[f"{key}_selector"], key
                     )

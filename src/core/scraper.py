@@ -32,7 +32,7 @@ class ScraperBase(ABC):
 
         # send selectors and access_type to cache database
         selector_output = self.selector_manager.output["selectors"]
-        print(selector_output)
+        print(f"SELECTORS - {selector_output}")
         if not selector_output:
             return False
         selector_output["access_type"] = access_type
@@ -42,14 +42,22 @@ class ScraperBase(ABC):
 
         # send data to cache database
         product_output = self.selector_manager.output["values"]
-        print(product_output)
+        print(f"PRODUCT - {product_output}")
         if not product_output:
             return False
-        product_output["product_id"] = self.product_id
-        product_output["status"] = "success"
         product_output["domain"] = domain
-        product_output["link"] = self.url
-        self.database_manager.save_data(product_output)
+        product = self.selector_manager.llm_manager.clean_data(selector_output)
+        print(f"CLEAN PRODUCT - {product}")
+        if not product:
+            return False
+        if (not product.get("name")) or (not product.get("price")):
+            return False
+
+        product["product_id"] = self.product_id
+        product["status"] = "success"
+        product["domain"] = domain
+        product["link"] = self.url
+        self.database_manager.save_data(product)
 
         print("Scraping completed")
         return True

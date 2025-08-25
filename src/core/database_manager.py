@@ -35,14 +35,16 @@ class DataManager:
             "product_id", data["product_id"]
         ).execute()
 
-    def get_product_info(self, product_id: str) -> Optional[dict]:
+    def get_product_info(
+        self, product_id: Optional[str] = None, product_url: Optional[str] = None
+    ) -> Optional[dict]:
         """Get product data from supabase"""
-        response = (
-            self.supabase.table(self.product_table)
-            .select("*")
-            .eq("product_id", product_id)
-            .execute()
-        )
+        stmt = self.supabase.table(self.product_table).select("*")
+        if product_id:
+            stmt = stmt.eq("product_id", product_id)
+        elif product_url:
+            stmt = stmt.eq("link", product_url)
+        response = stmt.execute()
         if response.data:
             return response.data[0]
 
