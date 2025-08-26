@@ -1,27 +1,18 @@
 <template>
   <div>
     <UForm :state="state" class="space-y-4 m-8" @submit.prevent="getProduct">
-      <UFormField label="Enter the Product Id" name="url" class="text-black"
->
+      <UFormField label="Enter the Product Id" name="url">
         <UInput
           v-model="state.productId"
           type="text"
           placeholder="product_12345"
           required
-          class="w-full text-black"
-
         />
       </UFormField>
 
-      <UButton
-        type="submit"
-        :loading="loading"
-        size="md"
-        block
-        class="text-white"
+      <UButton type="submit" :loading="loading" size="md" block
+        >Refresh</UButton
       >
-        {{ loading ? "Extraction..." : "Extract" }}
-      </UButton>
 
       <DisplayProduct v-if="product" :product="product" />
     </UForm>

@@ -3,12 +3,12 @@
 
 
 :root {
-  --ui-primary: var(--color-black);
+  --ui-primary: var(--color-white);
   --ui-secondary: var(--color-red-500);
   --ui-success: var(--ui-color-success-500);
   --ui-info: var(--ui-color-info-500);
   --ui-warning: var(--ui-color-warning-500);
   --ui-error: var(--ui-color-error-500);
-    --ui-bg: var(--color-white);
+    --ui-bg: oklch(14.1% 0.005 285.823);
 }
 
