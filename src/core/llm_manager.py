@@ -24,6 +24,7 @@ You are an expert in CSS selectors tasked with analyzing the raw HTML of a produ
 6. Prioritize selectors that include keywords like `name`, `title`, `price`, `brand`, `image`, or `img` in class names, IDs, or attributes (e.g., `data-testid`, `id`, `class="product-price"`). Avoid dynamic or generated class names (e.g., `sc-123abc`).
 7. Ensure selectors are concise, specific, and compatible with JavaScript’s `querySelector`.
 8. If no selector can be found for a data point or the data is unavailable (e.g., JavaScript-rendered), return an empty string (`""`) for the selector and provide a reason in the `notes` field (e.g., "Price likely JavaScript-rendered").
+9. Bad CSS Selectors
 """
 
 
@@ -41,39 +42,40 @@ def selector_user_prompt(html: str):
 
 
 data_cleaning_system_prompt = """
-You are an expert data cleaning assistant specializing in e-commerce product data. 
-Your task is to clean and standardize product data provided in JSON format, including product name, price, brand, and image URL. 
-The cleaned data should be consistent, accurate, and ready for storage in a database. Follow these rules for each field:
+You are an expert data cleaning assistant for e-commerce product data. Your task is to clean and standardize product data provided in JSON format, including product name, price, brand, and image URL, for database storage. Use the following rules to ensure consistent, accurate output:
 
 ## Cleaning Rules
 1. **Product Name**:
-   - Remove unnecessary words (e.g., "Ideal for Gift", "for Kids", "Heavy Sleepers") that describe use cases or marketing terms, while preserving the core product description.
-   - Remove special characters (e.g., excessive punctuation, emojis, or encoding artifacts) unless they are essential to the product name.
-   - Shorten overly long names to a concise, meaningful version (e.g., max 50 characters, if possible, without losing key details).
-   - Capitalize words consistently (e.g., title case: "Wake Up Light Sunrise Alarm Clock").
-   - If the name contains the brand, ensure it matches the brand field or extract it if the brand is missing.
+   - Keep the core product description (e.g., "Samba OG Shoes"), removing marketing terms (e.g., "Free Shipping", "Ideal for Gift"), colors (e.g., "White"), or site-specific details (e.g., "adidas US").
+   - Remove special characters (e.g., "!!!", "**") unless essential to the product name.
+   - Limit to 50 characters if possible, without losing key details.
+   - Use title case (e.g., "Adidas Samba OG Shoes").
+   - If the brand appears in the name, ensure it matches the brand field or extract it if brand is missing.
 
 2. **Price**:
-   - Remove currency symbols (e.g., "$", "€", "£") and whitespace or other unnecessary characters in the text.
-   - Convert the price to a string float format (e.g., "31.18" or "31.00" for whole numbers).
-   - If the price is invalid or missing, return an empty string ("") and explain in the `notes` field.
-   - Handle cases like "Free", "Contact for price", or ranges (e.g., "$30-$40") by selecting the lowest numeric value or returning "".
+   - Remove currency symbols (e.g., "$", "€", "£") and text (e.g., "USD").
+   - Convert to a string float (e.g., "$100" to "100.00", "$31.18" to "31.18").
+   - For price ranges (e.g., "$80-$100"), use the lowest value.
 
 3. **Brand**:
-   - Clean the brand by removing whitespace, special characters, or redundant terms (e.g., "Inc.", "Corp").
-   - If the brand is missing or empty, attempt to extract it from the product name (e.g., "JALL" from "JALL Wake Up Light").
-   - If no brand is found in the name, use the provided domain (e.g., "example.com" becomes "Example") as a fallback.
-   - Capitalize the brand appropriately (e.g., "Jall" instead of "JALL").
+   - Clean to title case (e.g., "ADIDAS" to "Adidas"), removing redundant terms (e.g., "Inc.").
+   - If missing or empty, extract from the product name (e.g., "adidas" from "adidas Samba OG Shoes").
+   - If no brand is in the name, use the domain (e.g., "adidas.com" becomes "Adidas") as a fallback.
+   - If no brand can be determined, return "" and explain in `notes`.
 
-6. **Common Errors to Avoid**:
-   - Do not remove essential product details (e.g., "Sunrise Alarm Clock" is core, but "Ideal for Gift" is not).
-   - Avoid altering numeric price values incorrectly (e.g., "$31.18" should become "31.18", not "31").
-   - Ensure the brand is not confused with generic terms in the product name (e.g., "Light" is not a brand).
+4. **Image**:
+   - Keep valid URLs (starting with "http" or "https", ending with ".jpg", ".png", etc.).
+   - If missing, invalid, or empty, return "" and explain in `notes`.
 
-## Additional Notes
-- If the input data is ambiguous (e.g., multiple possible brands in the name), choose the most likely one.
-- If the domain is provided, use it only as a last resort for the brand.
-- Prioritize clarity and database-ready output.
+6. **Constraints for Gemini-2.5-Flash**:
+   - Be precise and avoid ambiguity, as the model has limited context understanding.
+   - If data is unclear, make a best guess and document in `notes`.
+   - Keep processing simple to minimize errors.
+
+## Common Errors to Avoid
+- Do not return empty values unless explicitly justified (e.g., missing data).
+- Avoid removing essential product details (e.g., "Samba OG Shoes" is core).
+- Do not confuse generic terms (e.g., "Shoes") with brands.
 """
 
 
@@ -81,6 +83,39 @@ def cleaned_data_user_prompt(product_dict: dict):
     return f"""
         Clean the following product data according to the system rules.
         Return the cleaned data in JSON format with values and notes for each field (name, price, brand, image).
+
+        ## Cleaning Rules
+        1. **Product Name**:
+           - Keep the core product description (e.g., "Samba OG Shoes"), removing marketing terms (e.g., "Free Shipping", "Ideal for Gift"), colors (e.g., "White"), or site-specific details (e.g., "adidas US").
+           - Remove special characters (e.g., "!!!", "**") unless essential to the product name.
+           - Limit to 50 characters if possible, without losing key details.
+           - Use title case (e.g., "Adidas Samba OG Shoes").
+           - If the brand appears in the name, ensure it matches the brand field or extract it if brand is missing.
+
+        2. **Price**:
+           - Remove currency symbols (e.g., "$", "€", "£") and text (e.g., "USD").
+           - Convert to a string float (e.g., "$100" to "100.00", "$31.18" to "31.18").
+           - For price ranges (e.g., "$80-$100"), use the lowest value.
+
+        3. **Brand**:
+           - Clean to title case (e.g., "ADIDAS" to "Adidas"), removing redundant terms (e.g., "Inc.").
+           - If missing or empty, extract from the product name (e.g., "adidas" from "adidas Samba OG Shoes").
+           - If no brand is in the name, use the domain (e.g., "adidas.com" becomes "Adidas") as a fallback.
+           - If no brand can be determined, return "" and explain in `notes`.
+
+        4. **Image**:
+           - Keep valid URLs (starting with "http" or "https", ending with ".jpg", ".png", etc.).
+           - If missing, invalid, or empty, return "" and explain in `notes`.
+
+        6. **Constraints for Gemini-2.5-Flash**:
+           - Be precise and avoid ambiguity, as the model has limited context understanding.
+           - If data is unclear, make a best guess and document in `notes`.
+           - Keep processing simple to minimize errors.
+
+        ## Common Errors to Avoid
+        - Do not return empty values unless explicitly justified (e.g., missing data).
+        - Avoid removing essential product details (e.g., "Samba OG Shoes" is core).
+        - Do not confuse generic terms (e.g., "Shoes") with brands.
 
         **Input Data**:
         {product_dict}
@@ -131,7 +166,6 @@ class LlmManager:
         """Generate selectors with LLM"""
         print("LLM -- Generating selectors with LLM...")
         selectors = self.send_request_to_llm()
-        print(selectors)
         if not selectors:
             print("LLM -- LLM couldn't find the right selectors")
             return None

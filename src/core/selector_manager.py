@@ -87,14 +87,12 @@ class SelectorManager:
                 name="name",
             )
             parsed_dict["price"] = self.selector_to_text(
-                domain_data.get("price_selector")
-                or 'meta[property="og:price"]',
+                domain_data.get("price_selector") or 'meta[property="og:price"]',
                 attribute="content",
                 name="price",
             )
             parsed_dict["image"] = self.selector_to_text(
-                domain_data.get("image_selector")
-                or 'meta[property="og:image"]',
+                domain_data.get("image_selector") or 'meta[property="og:image"]',
                 attribute="content",
                 name="image",
             )

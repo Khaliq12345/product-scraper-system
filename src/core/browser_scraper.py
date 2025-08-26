@@ -16,10 +16,11 @@ class DynamicScraper(ScraperBase):
         """Extract html using simple requests"""
         with sync_playwright() as playwright:
             launcher = playwright.firefox
-            browser = launcher.launch(headless=False)
+            browser = launcher.launch(headless=True)
             page = browser.new_page()
             page.goto(self.url, timeout=120000)
-            page.wait_for_timeout(10000)
+            page.wait_for_timeout(5000)
+            page.pause()
             content = page.content()
             soup = HTMLParser(content)
             browser.close()
