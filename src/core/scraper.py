@@ -45,8 +45,9 @@ class ScraperBase(ABC):
         if not product_output:
             return False
         product_output["domain"] = domain
-        product = self.selector_manager.llm_manager.clean_data(product_output)
-        print(f"CLEAN PRODUCT - {product}")
+        # product = self.selector_manager.llm_manager.clean_data(product_output)
+        # print(f"CLEAN PRODUCT - {product}")
+        product = product_output
         if not product:
             return False
         if not product.get("name"):
